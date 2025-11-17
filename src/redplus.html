@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Smart Emergency Blood Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #880808;
+            --primary-dark: #6d0606;
+            --secondary: #f5f5f5;
+            --dark: #333;
+            --light: #fff;
+            --urgent-red: #880808;
+            --urgent-yellow: #ffeb3b;
+            --urgent-green: #4caf50;
+            --gray: #757575;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --blood-red: #880808;
+            --light-red: #FFECEC;
+        }
+        .dark-mode {
+            --primary: #880808;
+            --primary-dark: #6d0606;
+            --secondary: #424242;
+            --dark: #f5f5f5;
+            --light: #212121;
+            --gray: #bdbdbd;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: var(--secondary);
+            color: var(--dark);
+            transition: var(--transition);
+            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Login Modal Styles */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .login-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .login-container {
+            background-color: var(--light);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .login-modal.active .login-container {
+            transform: scale(1);
+        }
+        .login-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .login-header h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .close-login {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .close-login:hover {
+            transform: rotate(90deg);
+        }
+        .login-body {
+            padding: 30px;
+        }
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--gray);
+            background-color: var(--secondary);
+            color: var(--dark);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(136,8,8,0.2);
+        }
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        .login-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .login-footer {
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Rest of your existing CSS remains the same */
+        /* New Intro Animation Styles */
+        #intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFECEC 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .logo-wrap {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart {
+            width: 100%;
+            height: 100%;
+            animation: heartBeat 1.4s ease-in-out infinite;
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.06); }
+            30% { transform: scale(0.98); }
+            45% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .pulse-glow {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(136,8,8,0.15), rgba(136,8,8,0.06) 30%, transparent 55%);
+            z-index: 0;
+            animation: glow 1.8s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0% { transform: scale(0.95); opacity: 0.85; }
+            50% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.85; }
+        }
+        svg {
+            display: block;
+            z-index: 2;
+        }
+        .ecg-path {
+            stroke: #fff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: ecgMove 2s linear infinite;
+        }
+        @keyframes ecgMove {
+            0% { stroke-dashoffset: 1200; opacity: 0.95; }
+            50% { stroke-dashoffset: 600; opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0.95; }
+        }
+        .brand h1 {
+            margin: 0;
+            font-family: 'Book Antiqua', serif;
+            font-weight: bold;
+            font-size: clamp(32px, 5vw, 48px);
+            color:#880808;
+            letter-spacing: 0.5px;
+        }
+        .typewriter p {
+            font-family: 'Poppins', sans-serif;
+            color: var(--muted);
+            font-size: 16px;
+            margin-top: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid #880808;
+            width: 0;
+            animation: typing 3s steps(22) forwards;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 220px; }
+        }
+        .tagline {
+            color: #666;
+            font-size: 18px;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 4s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 420px) {
+            .logo-wrap {
+                width: 220px;
+                height: 220px;
+            }
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--light);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transform: translateY(-100%);
+            animation: slideDown 0.8s ease forwards;
+            animation-delay: 6s;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i {
+            color: var(--primary);
+            font-size: 28px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            font-size: 16px;
+        }
+        nav a:hover {
+            color: var(--primary);
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--dark);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .theme-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: rotate(180deg);
+        }
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid var(--gray);
+            background-color: var(--light);
+            color:#880808;
+            font-size: 14px;
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--dark);
+            transition: var(--transition);
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 6s;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+            animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        .hero h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            animation: textGlow 3s infinite alternate;
+        }
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.6); }
+        }
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .hero-buttons .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+        .hero-buttons .btn-outline {
+            border-color: white;
+            color: white;
+        }
+        .hero-buttons .btn-outline:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: var(--light);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 6s;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background-color: var(--secondary);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(136,8,8,0.05), transparent);
+            transition: 0.5s;
+        }
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        .feature-card:nth-child(1) { animation-delay: 6.2s; }
+        .feature-card:nth-child(2) { animation-delay: 6.4s; }
+        .feature-card:nth-child(3) { animation-delay: 6.6s; }
+        .feature-card:nth-child(4) { animation-delay: 6.8s; }
+        .feature-card:nth-child(5) { animation-delay: 7.0s; }
+        .feature-card:nth-child(6) { animation-delay: 7.2s; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .feature-icon {
+            background-color: var(--primary);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
+        }
+        .feature-card:hover .feature-icon::after {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        /* Emergency Section */
+        .emergency {
+            padding: 80px 0;
+            background-color: var(--secondary);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 6s;
+        }
+        .emergency-alert {
+            background-color: var(--urgent-red);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            animation: pulseAlert 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes pulseAlert {
+            0% { box-shadow: 0 0 0 0 rgba(136,8,8,0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(136,8,8,0); }
+            100% { box-shadow: 0 0 0 0 rgba(136,8,8,0); }
+        }
+        .emergency-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+        .emergency-alert i {
+            font-size: 28px;
+        }
+        .emergency-alert h3 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .request-form {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+            transform: perspective(1000px) rotateX(5deg);
+            transition: transform 0.5s ease;
+        }
+        .request-form:hover {
+            transform: perspective(1000px) rotateX(0deg);
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 16px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--gray);
+            background-color: var(--secondary);
+            color: var(--dark);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(136,8,8,0.2);
+            transform: translateY(-2px);
+        }
+        .urgency-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .urgency-option {
+            text-align: center;
+            padding: 20px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .urgency-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .urgency-option:hover::before {
+            transform: scaleX(1);
+        }
+        .urgency-option.red {
+            background-color: rgba(136,8,8,0.1);
+            border: 2px solid var(--urgent-red);
+        }
+        .urgency-option.yellow {
+            background-color: rgba(255, 235, 59, 0.1);
+            border: 2px solid var(--urgent-yellow);
+        }
+        .urgency-option.green {
+            background-color: rgba(76, 175, 80, 0.1);
+            border: 2px solid var(--urgent-green);
+        }
+        .urgency-option.selected {
+            font-weight: bold;
+        }
+        .urgency-option.red.selected {
+            background-color: var(--urgent-red);
+            color: white;
+        }
+        .urgency-option.yellow.selected {
+            background-color: var(--urgent-yellow);
+            color: var(--dark);
+        }
+        .urgency-option.green.selected {
+            background-color: var(--urgent-green);
+            color: white;
+        }
+        .urgency-option i {
+            font-size: 24px;
+        }
+
+        /* Donor Section */
+        .donors {
+            padding: 80px 0;
+            background-color: var(--light);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 6s;
+        }
+        .donor-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            margin-bottom: 50px;
+            gap: 20px;
+        }
+        .stat {
+            padding: 20px;
+            background-color: var(--secondary);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        .stat:hover::before {
+            transform: scaleX(1);
+        }
+        .stat:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: var(--gray);
+            font-size: 18px;
+        }
+        .donor-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .donor-card {
+            background-color: var(--secondary);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .donor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(136,8,8,0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .donor-card:hover::before {
+            opacity: 1;
+        }
+        .donor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .donor-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .donor-avatar::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: rgba(136,8,8,0.2);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .donor-card:hover .donor-avatar::after {
+            opacity: 1;
+        }
+        .donor-card:hover .donor-avatar {
+            transform: scale(1.1);
+        }
+        .donor-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .donor-blood-type {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 16px;
+            animation: pulse 2s infinite;
+        }
+        .donor-location {
+            color: var(--gray);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .status-eligible {
+            color: var(--urgent-green);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .status-ineligible {
+            color: var(--urgent-red);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 60px 0 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 6s;
+            position: relative;
+            overflow: hidden;
+        }
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+        .footer-column ul li:hover {
+            transform: translateX(5px);
+        }
+        .footer-column a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: var(--transition);
+        }
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(136,8,8,0.1);
+            border-radius: 50%;
+            animation: floatParticle 15s infinite linear;
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        /* Large devices (desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+
+        /* Medium devices (tablets, 768px to 1199px) */
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .container {
+                max-width: 960px;
+            }
+            .hero h2 {
+                font-size: 36px;
+            }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .donor-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Small devices (landscape phones, 576px to 767px) */
+        @media (max-width: 767px) and (min-width: 576px) {
+            .container {
+                max-width: 720px;
+            }
+            .header-content {
+                flex-wrap: wrap;
+            }
+            nav {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+            }
+            nav ul {
+                justify-content: center;
+            }
+            .hero h2 {
+                font-size: 32px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .donor-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .urgency-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Extra small devices (portrait phones, less than 576px) */
+        @media (max-width: 575px) {
+            .container {
+                padding: 0 15px;
+            }
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav {
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+            nav.active {
+                max-height: 300px;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px 0;
+                text-align: center;
+            }
+            .hamburger {
+                display: flex;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .hero {
+                padding: 80px 0;
+            }
+            .hero h2 {
+                font-size: 28px;
+            }
+            .hero p {
+                font-size: 16px;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            .features {
+                padding: 60px 0;
+            }
+            .section-title h2 {
+                font-size: 28px;
+            }
+            .section-title p {
+                font-size: 16px;
+            }
+            .feature-card {
+                padding: 20px;
+            }
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            .feature-card h3 {
+                font-size: 20px;
+            }
+            .emergency {
+                padding: 60px 0;
+            }
+            .request-form {
+                padding: 25px;
+            }
+            .urgency-selector {
+                grid-template-columns: 1fr;
+            }
+            .donors {
+                padding: 60px 0;
+            }
+            .donor-stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .stat {
+                padding: 15px;
+            }
+            .stat-number {
+                font-size: 36px;
+            }
+            .stat-label {
+                font-size: 16px;
+            }
+            .donor-cards {
+                grid-template-columns: 1fr;
+            }
+            .donor-card {
+                padding: 20px;
+            }
+            footer {
+                padding: 40px 0 20px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .footer-column h3 {
+                font-size: 18px;
+            }
+            /* Intro adjustments for mobile */
+            .logo-wrap {
+                width: 250px;
+                height: 250px;
+            }
+            .brand h1 {
+                font-size: 32px;
+            }
+            .tagline {
+                font-size: 16px;
+            }
+        }
+
+        /* Very small devices (less than 400px) */
+        @media (max-width: 400px) {
+            .logo-wrap {
+                width: 200px;
+                height: 200px;
+            }
+            .brand h1 {
+                font-size: 28px;
+            }
+            .hero h2 {
+                font-size: 24px;
+            }
+            .section-title h2 {
+                font-size: 24px;
+            }
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-container">
+            <div class="login-header">
+                <h2 data-en="Login to RedPulse" data-bn="রেডপালসে লগইন করুন">Login to RedPulse</h2>
+                <button class="close-login" id="closeLogin">&times;</button>
+            </div>
+            <div class="login-body">
+                <form class="login-form">
+                    <div class="form-group">
+                        <label for="email" data-en="Email Address" data-bn="ইমেল ঠিকানা">Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email" data-en-placeholder="Enter your email" data-bn-placeholder="আপনার ইমেল লিখুন">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" data-en-placeholder="Enter your password" data-bn-placeholder="আপনার পাসওয়ার্ড লিখুন">
+                    </div>
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember" data-en="Remember me" data-bn="আমাকে মনে রাখুন">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password" data-en="Forgot Password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="login-btn" data-en="Login" data-bn="লগইন">Login</button>
+                </form>
+                <div class="login-footer">
+                    <p data-en="Don't have an account?" data-bn="একটি অ্যাকাউন্ট নেই?">Don't have an account? <a href="#" id="goToRegister" data-en="Register now" data-bn="এখনই নিবন্ধন করুন">Register now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Intro Animation -->
+    <div id="intro">
+        <div class="stage">
+            <div class="logo-wrap">
+                <div class="pulse-glow"></div>
+                <svg class="heart" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 170 L90 160 C40 120 20 85 50 60 C72 42 100 60 100 88 C100 60 128 42 150 60 C180 85 160 120 110 160 L100 170 Z" fill="#880808"></path>
+                    <path class="ecg-path" d="M22 110 L38 110 L48 110 L54 82 L66 138 L78 60 L92 120 L106 96 L118 110 L132 110 L148 110 L178 110"></path>
+                </svg>
+            </div>
+            <div class="brand">
+                <h1>RedPulse</h1>
+                <div class="typewriter">
+                    <p>Developed by HackHaven</p>
+                </div>
+            </div>
+            <p class="tagline" id="tagline">Every heartbeat matters.</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1>RedPulse</h1>
+                </div>
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="#home" data-en="Home" data-bn="হোম">Home</a></li>
+                        <li><a href="#features" data-en="Features" data-bn="বৈশিষ্ট্য">Features</a></li>
+                        <li><a href="#emergency" data-en="Emergency" data-bn="জরুরি">Emergency</a></li>
+                        <li><a href="#donors" data-en="Find Donors" data-bn="দাতা খুঁজুন">Find Donors</a></li>
+                        <li><a href="#about" data-en="About" data-bn="সম্পর্কে">About</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="language-selector">
+                        <select id="languageSelect">
+                            <option value="en">English</option>
+                            <option value="bn">বাংলা</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <button class="btn btn-outline" id="loginBtn" data-en="Login" data-bn="লগইন">Login</button>
+                        <button class="btn btn-primary" data-en="Register" data-bn="নিবন্ধন">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h2 data-en="Connecting Blood Donors with Patients in Need" data-bn="রক্তদাতাদের প্রয়োজনী রোগীদের সাথে সংযুক্ত করা">Connecting Blood Donors with Patients in Need</h2>
+            <p data-en="RedPulse is a smart emergency blood network that helps connect blood donors with patients quickly in emergency situations. Our goal is to save lives by reducing the time between a blood request and transfusion." data-bn="রেডপালস একটি স্মার্ট জরুরি রক্ত নেটওয়ার্ক যা জরুরি পরিস্থিতিতে রক্তদাতাদের রোগীদের সাথে দ্রুত সংযুক্ত করতে সহায়তা করে। রক্তের অনুরোধ এবং স্থানান্তরের মধ্যে সময় হ্রাস করে জীবন বাঁচানো আমাদের লক্ষ্য।">RedPulse is a smart emergency blood network that helps connect blood donors with patients quickly in emergency situations. Our goal is to save lives by reducing the time between a blood request and transfusion.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" data-en="Find a Donor" data-bn="দাতা খুঁজুন">Find a Donor</button>
+                <button class="btn btn-outline" data-en="Become a Donor" data-bn="দাতা হোন">Become a Donor</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="Our Smart Features" data-bn="আমাদের স্মার্ট বৈশিষ্ট্য">Our Smart Features</h2>
+                <p data-en="RedPulse combines innovative technology with life-saving mission" data-bn="রেডপালস উদ্ভাবনী প্রযুক্তিকে জীবন রক্ষাকারী মিশনের সাথে একত্রিত করে">RedPulse combines innovative technology with life-saving mission</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 data-en="Automated Donor Eligibility" data-bn="স্বয়ংক্রিয় দাতার যোগ্যতা">Automated Donor Eligibility</h3>
+                    <p data-en="Tracks donation dates and health intervals to alert only eligible donors, saving critical response time." data-bn="দান তারিখ এবং স্বাস্থ্য ব্যবধান ট্র্যাক করে শুধুমাত্র যোগ্য দাতাদের সতর্ক করে, গুরুত্বপূর্ণ প্রতিক্রিয়া সময় সংরক্ষণ করে।">Tracks donation dates and health intervals to alert only eligible donors, saving critical response time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 data-en="Smart Urgency Triage" data-bn="স্মার্ট জরুরি ট্রাইয়েজ">Smart Urgency Triage</h3>
+                    <p data-en="AI-based priority system categorizes requests into RED (Critical), YELLOW (Urgent), and GREEN (Routine)." data-bn="এআই-ভিত্তিক অগ্রাধিকার ব্যবস্থা অনুরোধগুলিকে RED (সমালোচনামূলক), YELLOW (জরুরি) এবং GREEN (নিয়মিত) শ্রেণীতে বিভক্ত করে।">AI-based priority system categorizes requests into RED (Critical), YELLOW (Urgent), and GREEN (Routine).</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 data-en="Geo-Location Matching" data-bn="ভৌগলিক অবস্থান ম্যাচিং">Geo-Location Matching</h3>
+                    <p data-en="Matches donors with nearby hospitals using general location data while protecting user privacy." data-bn="ব্যবহারকারীর গোপনীয়তা রক্ষা করার সময় সাধারণ অবস্থানের ডেটা ব্যবহার করে কাছাকাছি হাসপাতালের সাথে দাতাদের মিল করে।">Matches donors with nearby hospitals using general location data while protecting user privacy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3 data-en="Travel Reimbursement" data-bn="ভ্রমণ প্রতিপূরণ">Travel Reimbursement</h3>
+                    <p data-en="Auto-calculates and pays donors' round-trip costs via ride-sharing APIs, removing financial barriers." data-bn="রাইড-শেয়ারিং API-এর মাধ্যমে দাতাদের রাউন্ড-ট্রিপ খরচ স্বয়ংক্রিয়ভাবে গণনা করে এবং প্রদান করে, আর্থিক বাধাগুলি দূর করে।">Auto-calculates and pays donors' round-trip costs via ride-sharing APIs, removing financial barriers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 data-en="Hospital Speed-Match" data-bn="হাসপাতাল স্পিড-ম্যাচ">Hospital Speed-Match</h3>
+                    <p data-en="Secure link with hospital databases to pre-check compatibility data, cutting crossmatching time." data-bn="হাসপাতাল ডেটাবেসের সাথে সুরক্ষিত লিঙ্ক সামঞ্জস্যতা ডেটা প্রি-চেক করতে, ক্রসম্যাচিং সময় কাটাতে।">Secure link with hospital databases to pre-check compatibility data, cutting crossmatching time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 data-en="Two-Way Rating System" data-bn="দুই-মুখী রেটিং সিস্টেম">Two-Way Rating System</h3>
+                    <p data-en="Donors and recipients rate each other based on reliability, punctuality, and communication." data-bn="দাতা এবং গ্রহীতারা নির্ভরযোগ্যতা, সময়ানুবর্তিতা এবং যোগাযোগের ভিত্তিতে একে অপরকে রেট দেয়।">Donors and recipients rate each other based on reliability, punctuality, and communication.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Section -->
+    <section class="emergency" id="emergency">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="Emergency Blood Request" data-bn="জরুরি রক্তের অনুরোধ">Emergency Blood Request</h2>
+                <p data-en="Send an urgent request for blood donation" data-bn="রক্তদানের জন্য জরুরি অনুরোধ পাঠান">Send an urgent request for blood donation</p>
+            </div>
+            <div class="emergency-alert">
+                <i class="fas fa-broadcast-tower"></i>
+                <h3 data-en="Emergency Broadcast System Active" data-bn="জরুরি ব্রডকাস্ট সিস্টেম সক্রিয়">Emergency Broadcast System Active</h3>
+            </div>
+            <div class="request-form">
+                <div class="form-group">
+                    <label for="bloodType" data-en="Blood Type Needed" data-bn="প্রয়োজনীয় রক্তের গ্রুপ">Blood Type Needed</label>
+                    <select class="form-control" id="bloodType">
+                        <option value="" data-en="Select Blood Type" data-bn="রক্তের গ্রুপ নির্বাচন করুন">Select Blood Type</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location" data-en="Hospital Location" data-bn="হাসপাতালের অবস্থান">Hospital Location</label>
+                    <input type="text" class="form-control" id="location" placeholder="Enter hospital name or location" data-en-placeholder="Enter hospital name or location" data-bn-placeholder="হাসপাতালের নাম বা অবস্থান লিখুন">
+                </div>
+                <div class="form-group">
+                    <label data-en="Urgency Level" data-bn="জরুরি স্তর">Urgency Level</label>
+                    <div class="urgency-selector">
+                        <div class="urgency-option red selected">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p data-en="RED - Critical" data-bn="লাল - সমালোচনামূলক">RED - Critical</p>
+                            <small data-en="Life-threatening" data-bn="জীবন-হুমকি">Life-threatening</small>
+                        </div>
+                        <div class="urgency-option yellow">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p data-en="YELLOW - Urgent" data-bn="হলুদ - জরুরি">YELLOW - Urgent</p>
+                            <small data-en="Needed soon" data-bn="শীঘ্রই প্রয়োজন">Needed soon</small>
+                        </div>
+                        <div class="urgency-option green">
+                            <i class="fas fa-check-circle"></i>
+                            <p data-en="GREEN - Routine" data-bn="সবুজ - নিয়মিত">GREEN - Routine</p>
+                            <small data-en="Scheduled need" data-bn="নির্ধারিত প্রয়োজন">Scheduled need</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes" data-en="Additional Notes" data-bn="অতিরিক্ত নোট">Additional Notes</label>
+                    <textarea class="form-control" id="notes" rows="3" placeholder="Any specific requirements or information" data-en-placeholder="Any specific requirements or information" data-bn-placeholder="কোনো নির্দিষ্ট প্রয়োজনীয়তা বা তথ্য"></textarea>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px;">
+                    <i class="fas fa-bullhorn"></i> 
+                    <span data-en="Send Emergency Request" data-bn="জরুরি অনুরোধ পাঠান">Send Emergency Request</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donors Section -->
+    <section class="donors" id="donors">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="Available Donors" data-bn="উপলব্ধ দাতা">Available Donors</h2>
+                <p data-en="Find eligible donors in your area" data-bn="আপনার এলাকায় যোগ্য দাতা খুঁজুন">Find eligible donors in your area</p>
+            </div>
+            <div class="donor-stats">
+                <div class="stat">
+                    <div class="stat-number">1,247</div>
+                    <div class="stat-label" data-en="Active Donors" data-bn="সক্রিয় দাতা">Active Donors</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">384</div>
+                    <div class="stat-label" data-en="Lives Saved" data-bn="সংরক্ষিত জীবন">Lives Saved</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">56</div>
+                    <div class="stat-label" data-en="Cities Covered" data-bn="আচ্ছাদিত শহর">Cities Covered</div>
+                </div>
+            </div>
+            <div class="donor-cards">
+                <div class="donor-card">
+                    <div class="donor-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="donor-name">Rahim Khan</div>
+                    <div class="donor-blood-type">O+</div>
+                    <div class="donor-location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span data-en="2.3 km away" data-bn="২.৩ কিমি দূরে">2.3 km away</span>
+                    </div>
+                    <div class="donor-status">
+                        <span class="status-eligible" data-en="Eligible to donate" data-bn="দান করার যোগ্য">Eligible to donate</span>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px;" data-en="Request Donation" data-bn="দানের অনুরোধ করুন">Request Donation</button>
+                </div>
+                <div class="donor-card">
+                    <div class="donor-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="donor-name">Fatima Begum</div>
+                    <div class="donor-blood-type">B+</div>
+                    <div class="donor-location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span data-en="1.7 km away" data-bn="১.৭ কিমি দূরে">1.7 km away</span>
+                    </div>
+                    <div class="donor-status">
+                        <span class="status-eligible" data-en="Eligible to donate" data-bn="দান করার যোগ্য">Eligible to donate</span>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px;" data-en="Request Donation" data-bn="দানের অনুরোধ করুন">Request Donation</button>
+                </div>
+                <div class="donor-card">
+                    <div class="donor-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="donor-name">Abdul Karim</div>
+                    <div class="donor-blood-type">A-</div>
+                    <div class="donor-location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span data-en="3.1 km away" data-bn="৩.১ কিমি দূরে">3.1 km away</span>
+                    </div>
+                    <div class="donor-status">
+                        <span class="status-ineligible" data-en="Recently donated" data-bn="সম্প্রতি দান করেছেন">Recently donated</span>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px;" disabled data-en="Not Available" data-bn="উপলব্ধ নয়">Not Available</button>
+                </div>
+                <div class="donor-card">
+                    <div class="donor-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="donor-name">Tasnim Ahmed</div>
+                    <div class="donor-blood-type">AB+</div>
+                    <div class="donor-location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span data-en="4.2 km away" data-bn="৪.২ কিমি দূরে">4.2 km away</span>
+                    </div>
+                    <div class="donor-status">
+                        <span class="status-eligible" data-en="Eligible to donate" data-bn="দান করার যোগ্য">Eligible to donate</span>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px;" data-en="Request Donation" data-bn="দানের অনুরোধ করুন">Request Donation</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>RedPulse</h3>
+                    <p data-en="Connecting blood donors with patients in emergency situations to save lives." data-bn="জরুরি পরিস্থিতিতে রক্তদাতাদের রোগীদের সাথে সংযুক্ত করে জীবন বাঁচানো।">Connecting blood donors with patients in emergency situations to save lives.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-en="Quick Links" data-bn="দ্রুত লিঙ্ক">Quick Links</h3>
+                    <ul>
+                        <li><a href="#home" data-en="Home" data-bn="হোম">Home</a></li>
+                        <li><a href="#features" data-en="Features" data-bn="বৈশিষ্ট্য">Features</a></li>
+                        <li><a href="#emergency" data-en="Emergency" data-bn="জরুরি">Emergency</a></li>
+                        <li><a href="#donors" data-en="Find Donors" data-bn="দাতা খুঁজুন">Find Donors</a></li>
+                        <li><a href="#about" data-en="About Us" data-bn="আমাদের সম্পর্কে">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-en="Resources" data-bn="সম্পদ">Resources</h3>
+                    <ul>
+                        <li><a href="#" data-en="Blood Donation Guide" data-bn="রক্তদান গাইড">Blood Donation Guide</a></li>
+                        <li><a href="#" data-en="Eligibility Criteria" data-bn="যোগ্যতার মানদণ্ড">Eligibility Criteria</a></li>
+                        <li><a href="#" data-en="Hospital Partners" data-bn="হাসপাতাল অংশীদার">Hospital Partners</a></li>
+                        <li><a href="#" data-en="FAQ" data-bn="প্রশ্নোত্তর">FAQ</a></li>
+                        <li><a href="#" data-en="Blog" data-bn="ব্লগ">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-en="Contact Us" data-bn="যোগাযোগ করুন">Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> <span data-en="123 Health Street, City" data-bn="১২৩ হেলথ স্ট্রিট, শহর">123 Health Street, City</span></li>
+                        <li><i class="fas fa-phone"></i> +1 234 567 8900</li>
+                        <li><i class="fas fa-envelope"></i> info@redpulse.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-en="&copy; 2023 RedPulse - Smart Emergency Blood Network. All rights reserved." data-bn="&copy; ২০২৩ রেডপালস - স্মার্ট জরুরি রক্ত নেটওয়ার্ক। সর্বস্বত্ব সংরক্ষিত।">&copy; 2023 RedPulse - Smart Emergency Blood Network. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Login Modal Functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLogin = document.getElementById('closeLogin');
+        
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        });
+        
+        closeLogin.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        });
+        
+        // Close modal when clicking outside the login container
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+                document.body.style.overflow = 'auto'; // Restore scrolling
+            }
+        });
+        
+        // Login form submission
+        const loginForm = document.querySelector('.login-form');
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would normally handle the login logic
+            // For now, we'll just close the modal
+            loginModal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+            
+            // Show a success message (optional)
+            alert('Login successful!');
+        });
+        
+        // Go to register link
+        const goToRegister = document.getElementById('goToRegister');
+        goToRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.remove('active');
+            // Here you would normally show the registration modal
+            alert('Registration feature would open here');
+        });
+
+        // Intro Animation Sequence
+        document.addEventListener('DOMContentLoaded', function() {
+            const intro = document.getElementById('intro');
+            
+            // Hide intro and show main content after animation
+            setTimeout(() => {
+                intro.style.opacity = '0';
+                intro.style.transition = 'opacity 0.8s ease';
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                }, 800);
+            }, 5000);
+            
+            // Create floating particles
+            createParticles();
+        });
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 20 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation delay
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Mobile Navigation Toggle
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+            });
+        });
+
+        // Dark/Light Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Urgency Selector
+        const urgencyOptions = document.querySelectorAll('.urgency-option');
+        urgencyOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                urgencyOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+
+        // Language Selector
+        const languageSelect = document.getElementById('languageSelect');
+        languageSelect.addEventListener('change', (e) => {
+            changeLanguage(e.target.value);
+        });
+
+        // Language Change Function
+        function changeLanguage(lang) {
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-en]').forEach(element => {
+                if (lang === 'en') {
+                    if (element.hasAttribute('data-en-placeholder')) {
+                        element.placeholder = element.getAttribute('data-en-placeholder');
+                    } else {
+                        element.textContent = element.getAttribute('data-en');
+                    }
+                } else if (lang === 'bn') {
+                    if (element.hasAttribute('data-bn-placeholder')) {
+                        element.placeholder = element.getAttribute('data-bn-placeholder');
+                    } else {
+                        element.textContent = element.getAttribute('data-bn');
+                    }
+                }
+            });
+            
+            // Update page direction for RTL languages
+            if (lang === 'bn') {
+                document.body.style.direction = 'rtl';
+            } else {
+                document.body.style.direction = 'ltr';
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add scroll animations
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            return (
+                rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8
+            );
+        }
+
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.feature-card, .stat, .donor-card');
+            
+            elements.forEach(element => {
+                if (isElementInViewport(element)) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Initial check on page load
+        window.addEventListener('load', handleScrollAnimation);
+        // Check on scroll
+        window.addEventListener('scroll', handleScrollAnimation);
+    </script>
+</body>
+</html>
